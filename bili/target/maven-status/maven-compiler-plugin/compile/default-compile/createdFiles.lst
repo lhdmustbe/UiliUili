@@ -1,0 +1,13 @@
+com\example\bili\mapper\UserMapper.class
+com\example\bili\common\CodeGenerator.class
+com\example\bili\controller\TestSortController.class
+com\example\bili\service\ITestSortService.class
+com\example\bili\BiliApplication.class
+com\example\bili\service\impl\TestSortServiceImpl.class
+com\example\bili\mapper\TestSortMapper.class
+com\example\bili\common\Hello.class
+com\example\bili\controller\UserController.class
+com\example\bili\service\impl\UserServiceImpl.class
+com\example\bili\entity\TestSort.class
+com\example\bili\entity\User.class
+com\example\bili\service\IUserService.class
