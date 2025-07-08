@@ -2,88 +2,79 @@
   <div class="main-page">
     <div class="gundong_box">
       <div class="gundong">
-        <a href="/video/1" style="width: 616px;height: 430.25px; display: block; position: relative;">
+        <router-link :to="{ name: 'VideoPage', params: { id: mainVideo.id }}"
+                     style="width: 616px;height: 430.25px; display: block; position: relative;">
           <span
-              style="position: absolute;bottom: 10%;margin-left: 15px;text-decoration: none;color: white ;font-weight: bold;font-size: 20px;width: 516px">凸变英雄，b站出品</span>
-          <img src="../assets/gundong1.png">
-        </a>
+              style="position: absolute;bottom: 10%;margin-left: 15px;text-decoration: none;color: white ;font-weight: bold;font-size: 20px;width: 516px">
+            {{ mainVideo.title }}
+          </span>
+          <img :src="mainVideo.img">
+        </router-link>
       </div>
-
       <div class="gundong_right">
-        <a href="/video/2" class="video-card">
-          <img src="../assets/gundong1.png">
-          <span>&^*(^*(^312&^&*(^&*^(&*)</span>
-        </a>
-        <a href="/video/3" class="video-card">
-          <img src="../assets/gundong1.png">
-          <span>&^*(^*(^&^&*4124124124(^&*^(&*)</span>
-        </a>
-        <a href="/video/4" class="video-card">
-          <img src="../assets/gundong1.png">
-          <span>&^*(^*(^&^&123123123*(^&*^(&*)</span>
-        </a>
-        <a href="/video/5" class="video-card">
-          <img src="../assets/gundong1.png">
-          <span>&^*(^*(^&^&412421*(^&*^(&*)</span>
-        </a>
-        <a href="/video/6" class="video-card">
-          <img src="../assets/gundong1.png">
-          <span>&^*(^*(^&^&*(4214^&*^(&*)</span>
-        </a>
-        <a href="/video/7" class="video-card">
-          <img src="../assets/gundong1.png">
-          <span>&^*(^*(^&^&*(124^&*^(&*)</span>
-        </a>
+        <router-link
+            v-for="video in videoList"
+            :key="video.id"
+            :to="{ name: 'VideoPage', params: { id: video.id }}"
+            target="_blank"
+            class="video-card router-link">
+          <img :src="video.img">
+          <span>{{ video.title }}</span>
+        </router-link>
       </div>
     </div>
 
     <div class="main_video">
-      <a href="/video/8" class="video-card">
-        <img src="../assets/gundong1.png">
-        <span>&^*(^*(^&^&*(^&*^(&*)</span>
-      </a>
-      <a href="/video/9" class="video-card">
-        <img src="../assets/gundong1.png">
-        <span>&^*(^*(^&^&*(^&*^(&*)</span>
-      </a>
-      <a href="/video/10" class="video-card">
-        <img src="../assets/gundong1.png">
-        <span>&^*(^*(^&^&*(^&*^(&*)</span>
-      </a>
-      <a href="/video/11" class="video-card">
-        <img src="../assets/gundong1.png">
-        <span>&^*(^*(^&^&*(^&*^(&*)</span>
-      </a>
-      <a href="/video/12" class="video-card">
-        <img src="../assets/gundong1.png">
-        <span>&^*(^*(^&^&*(^&*^(&*)</span>
-      </a>
+      <router-link
+          v-for="video in recommendVideos"
+          :key="video.id"
+          :to="{ name: 'VideoPage', params: { id: video.id }}"
+          target="_blank"
+          class="video-card router-link">
+        <img :src="video.img">
+
+        <span>{{ video.title }}</span>
+      </router-link>
     </div>
+
+
   </div>
 </template>
 
 <script>
+
 export default {
   name: "MainPage",
   data() {
     return {
       mainVideo: {
         id: 1,
-        url: '/video/1',
-        img: '../assets/gundong1.png',
+        img: require('../assets/gundong1.png'),
         title: '凸变英雄，b站出品',
-        views: '',
-        up: ''
       },
-      recommendVideos: [],
-      videoList: []
+      videoList: [
+        {id: 2, img: require('../assets/gundong1.png'), title: '视频2'},
+        {id: 3, img: require('../assets/gundong1.png'), title: '视频3'},
+        {id: 4, img: require('../assets/gundong1.png'), title: '视频4'},
+        {id: 5, img: require('../assets/gundong1.png'), title: '视频5'},
+        {id: 6, img: require('../assets/gundong1.png'), title: '视频6'},
+        {id: 7, img: require('../assets/gundong1.png'), title: '视频7'}
+      ],
+      recommendVideos: [
+        {id: 8, img: require('../assets/gundong1.png'), title: '推荐视频1'},
+        {id: 9, img: require('../assets/gundong1.png'), title: '推荐视频2'},
+        {id: 10, img: require('../assets/gundong1.png'), title: '推荐视频3'},
+        {id: 11, img: require('../assets/gundong1.png'), title: '推荐视频4'},
+        {id: 12, img: require('../assets/gundong1.png'), title: '推荐视频5'}
+      ]
     }
   },
 }
 </script>
 
 <style scoped>
-a {
+a,
+.router-link {
   text-decoration: none;
   color: white;
 }

@@ -1,14 +1,13 @@
 <template>
-  <IndexPage/>
+  <router-view></router-view>
 </template>
 
 <script>
-import IndexPage from "@/components/indexPage";
-
 export default {
   name: 'App',
-  components: {
-    IndexPage
+  components: {},
+  data() {
+    return {}
   }
 }
 </script>

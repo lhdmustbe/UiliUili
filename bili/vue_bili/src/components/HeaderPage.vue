@@ -25,6 +25,7 @@
 
       <!--      登录框-->
       <el-dialog
+          v-if="loginVisible"
           v-model="loginVisible"
           width="30%"
           :before-close="handleClose">

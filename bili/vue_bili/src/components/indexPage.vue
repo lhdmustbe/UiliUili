@@ -11,7 +11,6 @@
 import Nav from "@/components/NavPage";
 import Header from "@/components/HeaderPage";
 import MainPage from "@/components/MainPage";
-
 export default {
   name: "indexPage",
   components: {
