@@ -23,6 +23,7 @@
         </li>
       </ul>
 
+
       <!--      登录框-->
       <el-dialog
           v-if="loginVisible"
@@ -59,6 +60,8 @@
 </template>
 
 <script>
+// import axios from 'axios'
+
 export default {
   name: "HeaderPage",
   data() {
@@ -84,10 +87,22 @@ export default {
     handleClose() {
       this.loginVisible = false
     },
-    handleLogin() {
-      // 这里添加登录逻辑
-      console.log('登录信息:', this.loginForm)
-      this.loginVisible = false
+    async handleLogin() {
+      try {
+        const response = await this.$axios.post('http://localhost:8081/users/login', this.loginForm)
+        if (response.data.code === 200) {
+          this.$message.success('登录成功')
+          // 存储 token 到 localStorage
+          localStorage.setItem('token', response.data.data.token)
+          // 关闭登录框
+          this.loginVisible = false
+        } else {
+          this.$message.error(response.data.msg || '登录失败')
+        }
+      } catch (error) {
+        this.$message.error('网络请求失败: ' + error.message)
+        console.error('登录请求错误:', error)
+      }
     }
   }
 }
