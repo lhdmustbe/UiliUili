@@ -8,14 +8,34 @@
       </ul>
 
       <el-input v-model="inputValue" placeholder="请输入内容" class="search" suffix-icon="Search"></el-input>
+
       <ul class="flex-item" style="margin-right: 45px">
         <li>
-          <a style="all: revert; cursor: pointer" @click="showLoginDialog">
-            <div class="personal_center">
-              登录
+          <div
+              @mouseenter="isLoggedIn ? showUserInfo = true : null"
+              @mouseleave="isLoggedIn ? showUserInfo = false : null">
+
+            <a style="all: revert; cursor: pointer" @click="showLoginDialog">
+
+              <div class="personal_center"
+                   :class="{ 'logged-in': isLoggedIn }">
+                {{ isLoggedIn ? userInfo.username : '登录' }}
+              </div>
+
+            </a>
+
+            <!-- 用户信息弹窗 -->
+            <div v-if="isLoggedIn && showUserInfo" class="user-info-popup">
+              <div class="user-info-header">
+                <span>{{ userInfo.username }}</span>
+              </div>
+              <div class="user-info-content">
+                <el-button @click="logout" type="text">退出登录</el-button>
+              </div>
             </div>
-          </a>
+          </div>
         </li>
+
         <li v-for="item in rightNav" :key="item">
           <a href="">
             {{ item }}
@@ -26,9 +46,11 @@
 
       <!--      登录框-->
       <el-dialog
+          style="border-radius: 20px"
           v-if="loginVisible"
           v-model="loginVisible"
           width="30%"
+          :style="{ display: isLoggedIn ? 'none' : 'block' }"
           :before-close="handleClose">
         <el-form :model="loginForm">
 
@@ -66,10 +88,13 @@ export default {
   name: "HeaderPage",
   data() {
     return {
+      isLoggedIn: false, // 新增登录状态
+      userInfo: null,
+      showUserInfo: false,
+
       inputValue: '',
       leftNav: ['首页', '番剧', '漫画', '直播'],
       rightNav: ['收藏', '历史', '消息', '投稿'],
-
       loginVisible: false,
       loginForm: {
         username: '',
@@ -78,31 +103,39 @@ export default {
     }
   },
   methods: {
-    handleSearch() {
-
-    },
     showLoginDialog() {
-      this.loginVisible = true
+      // 已登录状态直接返回
+      if (this.isLoggedIn) return;
+      this.loginVisible = true;
     },
     handleClose() {
       this.loginVisible = false
     },
     async handleLogin() {
       try {
-        const response = await this.$axios.post('http://localhost:8081/users/login', this.loginForm)
+        const response = await this.$axios.post('http://localhost:8081/users/login', {
+          username: this.loginForm.username,
+          passwordHash: this.loginForm.password
+        });
+
         if (response.data.code === 200) {
-          this.$message.success('登录成功')
-          // 存储 token 到 localStorage
-          localStorage.setItem('token', response.data.data.token)
-          // 关闭登录框
-          this.loginVisible = false
+          localStorage.setItem('token', response.data.data);
+          this.$message.success('登录成功');
+          this.isLoggedIn = true;
+          this.loginVisible = false; // 强制关闭弹窗
+          this.userInfo = {username: this.loginForm.username}; // 保存用户信息
         } else {
-          this.$message.error(response.data.msg || '登录失败')
+          this.$message.error(response.data.msg);
         }
       } catch (error) {
-        this.$message.error('网络请求失败: ' + error.message)
-        console.error('登录请求错误:', error)
+        this.$message.error('登录失败: ' + error.response?.data?.msg || error.message);
       }
+    },
+    logout() {
+      localStorage.removeItem('token');
+      this.isLoggedIn = false;
+      this.userInfo = null;
+      this.$message.success('已退出登录');
     }
   }
 }
@@ -125,6 +158,8 @@ export default {
 }
 
 .flex-item {
+  position: relative;
+  overflow: visible;
   list-style: none;
   display: flex;
 }
@@ -148,6 +183,9 @@ export default {
 }
 
 .personal_center {
+  display: inline-block;
+  will-change: transform;
+  transition: transform 0.2s ease-out;
   padding: 3px;
   line-height: 37px;
   text-align: center;
@@ -193,7 +231,6 @@ export default {
 
 .input_Username {
   width: 310px;
-
   margin-left: 10px;
   font-style: normal;
   font-weight: 400;
@@ -209,7 +246,6 @@ export default {
 .input_Password {
   width: 310px;
   margin-left: 10px;
-
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -220,4 +256,43 @@ export default {
   outline: none;
   border: none;
 }
+
+.user-info-popup {
+  position: absolute;
+  top: 120%;
+  right: 0%;
+  width: 300px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 10px;
+}
+
+.user-info-header {
+  padding: 8px 0;
+  border-bottom: 1px solid #ebeef5;
+  margin-bottom: 8px;
+}
+
+.user-info-content {
+  padding: 8px 0;
+}
+
+.personal_center:hover {
+  transform: scale(1.1);
+}
+
+.personal_center.logged-in {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.personal_center.logged-in:hover {
+  transform: scale(1.2);
+}
+
+/*.personal_center.logged-in:hover .user-info-popup{*/
+/*  */
+/*}*/
 </style>

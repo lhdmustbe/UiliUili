@@ -43,4 +43,21 @@ public class Result {
         res.setData(data);
         return res;
     }
+
+    // 添加链式调用支持
+    public Result code(int code) {
+        this.code = code;
+        return this;
+    }
+
+    public Result msg(String msg) {
+        this.msg = msg;
+        return this;
+    }
+
+    public Result data(Object data) {
+        this.data = data;
+        return this;
+    }
+
 }
