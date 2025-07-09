@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 
 public class CodeGenerator {
     public static void main(String[] args) {
-        FastAutoGenerator.create("jdbc:mysql://localhost:3306/wms?characterEncoding=utf8&useSSL=false", "root", "123456")
+        FastAutoGenerator.create("jdbc:mysql://localhost:3306/uiliuili?characterEncoding=utf8&useSSL=false", "root", "123456")
                 .globalConfig(builder -> builder
                         .author("Baomidou")
                         .outputDir(Paths.get(System.getProperty("user.dir")) + "/src/main/java")

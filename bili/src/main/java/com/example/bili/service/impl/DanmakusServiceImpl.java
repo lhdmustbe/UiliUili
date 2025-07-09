@@ -1,0 +1,20 @@
+package com.example.bili.service.impl;
+
+import com.example.bili.entity.Danmakus;
+import com.example.bili.mapper.DanmakusMapper;
+import com.example.bili.service.IDanmakusService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
+/**
+ * <p>
+ * 服务实现类
+ * </p>
+ *
+ * @author Baomidou
+ * @since 2025-07-09
+ */
+@Service
+public class DanmakusServiceImpl extends ServiceImpl<DanmakusMapper, Danmakus> implements IDanmakusService {
+
+}
