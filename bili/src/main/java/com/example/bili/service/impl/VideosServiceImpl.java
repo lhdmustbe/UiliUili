@@ -16,8 +16,5 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> implements IVideosService {
-    @Override
-    public void increaseViewCount(Long videoId) {
-        this.baseMapper.increaseViewCount(videoId);
-    }
+
 }

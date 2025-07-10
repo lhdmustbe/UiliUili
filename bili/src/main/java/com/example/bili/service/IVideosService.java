@@ -12,5 +12,4 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2025-07-09
  */
 public interface IVideosService extends IService<Videos> {
-    void increaseViewCount(Long videoId);
 }

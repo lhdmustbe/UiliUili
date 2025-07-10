@@ -8,14 +8,69 @@ import com.example.bili.service.IVideosService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 视频控制器
  */
 @RestController
-@RequestMapping("/videos")
+@RequestMapping("/video")
 public class VideosController {
+
+
+    @GetMapping({"/{videoId}/basic", "/{videoId}"})
+    public Result getVideoBasicInfo(@PathVariable Long videoId) {
+        Videos video = videosService.getById(videoId);
+        if (video == null || video.getStatus() != 1) {
+            return Result.fail("视频不存在或未发布");
+        }
+        Map<String, String> data = new HashMap<>();
+        data.put("videoId", video.getVideoId().toString());
+        data.put("coverUrl", video.getCoverUrl());
+        data.put("videoUrl", video.getVideoUrl());
+        data.put("title", video.getTitle());
+        data.put("description", video.getDescription());
+        data.put("tags", video.getTags());
+        data.put("publishTime", video.getPublishTime().toString());
+        data.put("viewCount", String.valueOf(video.getViewCount()));
+        data.put("likeCount", String.valueOf(video.getLikeCount()));
+        data.put("favoriteCount", String.valueOf(video.getFavoriteCount()));
+        return Result.success(data);
+    }
+
+    /**
+     * 批量获取视频基础信息（用于推荐流等场景）
+     *
+     * @param videoIds 视频ID列表，用逗号分隔
+     * @return 视频信息列表
+     */
+    @GetMapping("/batch")
+    public Result getBatchVideoBasicInfo(@RequestParam String videoIds) {
+        List<Long> ids = Arrays.stream(videoIds.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+
+        List<Videos> videos = videosService.list(new QueryWrapper<Videos>()
+                .in("video_id", ids)
+                .eq("status", 1)); // 只查询已发布的视频
+
+        List<Map<String, Object>> result = videos.stream().map(video -> {
+            Map<String, Object> item = new HashMap<>();
+            item.put("videoId", video.getVideoId());
+            item.put("coverUrl", video.getCoverUrl());
+            item.put("videoUrl", video.getVideoUrl());
+            item.put("title", video.getTitle());
+            item.put("duration", video.getDuration());
+            return item;
+        }).collect(Collectors.toList());
+
+        return Result.success(result);
+    }
+
 
     @Resource
     private IVideosService videosService;
@@ -28,7 +83,6 @@ public class VideosController {
         videosService.save(video);
         return Result.success(video);
     }
-
     /**
      * 更新视频信息
      */
@@ -37,7 +91,6 @@ public class VideosController {
         videosService.updateById(video);
         return Result.success(video);
     }
-
     /**
      * 删除视频
      */
@@ -46,16 +99,6 @@ public class VideosController {
         videosService.removeById(id);
         return Result.success();
     }
-
-    /**
-     * 根据ID查询视频详情
-     */
-    @GetMapping("/{id}")
-    public Result<Videos> findById(@PathVariable Long id) {
-        Videos video = videosService.getById(id);
-        return Result.success(video);
-    }
-
     /**
      * 分页查询视频列表
      */
@@ -79,24 +122,4 @@ public class VideosController {
         return Result.success(page);
     }
 
-    /**
-     * 获取用户上传的视频列表
-     */
-    @GetMapping("/user/{userId}")
-    public Result<List<Videos>> findByUserId(@PathVariable Long userId) {
-        QueryWrapper<Videos> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId)
-                .orderByDesc("publish_time");
-        List<Videos> videos = videosService.list(queryWrapper);
-        return Result.success(videos);
-    }
-
-    /**
-     * 增加视频播放量
-     */
-    @PostMapping("/{id}/view")
-    public Result<?> increaseViewCount(@PathVariable Long id) {
-        videosService.increaseViewCount(id);
-        return Result.success();
-    }
 }

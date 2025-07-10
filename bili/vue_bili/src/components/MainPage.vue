@@ -4,6 +4,7 @@
       <div class="gundong" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
         <router-link
             :to="{ name: 'VideoPage', params: { id: currentVideo.id }}"
+            target="_blank"
             style="width: 616px;height: 430.25px; display: block; position: relative;"
         >
           <transition name="fade" mode="out-in">
@@ -72,24 +73,11 @@ export default {
       timer: null,
       mainVideo: [
         {id: 1, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
-        {id: 2, img: require('@/assets/gundong2.png'), title: '图片2标题'},
-        {id: 3, img: require('@/assets/gundong3.png'), title: '图片3标题'}
+        {id: 2, img: require('@/assets/gundong2.png'), title: '凸变英雄，b站出品'},
+        {id: 3, img: require('@/assets/gundong3.png'), title: '凸变英雄，b站出品'}
       ],
-      videoList: [
-        {id: 2, img: require('../assets/gundong3.png'), title: '视频2'},
-        {id: 3, img: require('../assets/gundong2.png'), title: '视频3'},
-        {id: 4, img: require('../assets/gundong3.png'), title: '视频4'},
-        {id: 5, img: require('../assets/gundong1.png'), title: '视频5'},
-        {id: 6, img: require('../assets/gundong3.png'), title: '视频6'},
-        {id: 7, img: require('../assets/gundong2.png'), title: '视频7'}
-      ],
-      recommendVideos: [
-        {id: 8, img: require('../assets/gundong1.png'), title: '推荐视频1'},
-        {id: 9, img: require('../assets/gundong3.png'), title: '推荐视频2'},
-        {id: 10, img: require('../assets/gundong2.png'), title: '推荐视频3'},
-        {id: 11, img: require('../assets/gundong1.png'), title: '推荐视频4'},
-        {id: 12, img: require('../assets/gundong3.png'), title: '推荐视频5'}
-      ]
+      videoList: [],
+      recommendVideos: []
     }
   },
   computed: {
@@ -97,13 +85,49 @@ export default {
       return this.mainVideo[this.currentIndex];
     }
   },
+
   mounted() {
     this.startAutoPlay();
+    this.fetchVideoList(); // 确保在mounted中调用
   },
   beforeUnmount() {
     this.stopAutoPlay();
   },
   methods: {
+    async fetchVideoList() {
+      try {
+        const response = await this.$axios.get('http://localhost:8081/video/batch', {
+          params: {
+
+
+            videoIds: '1,2,3,4,5' // 确保这些ID在数据库存在且status=1
+
+            // 修改成随机数按照已经有点视频id号进行不重复随机数
+
+
+          }
+        });
+        if (response.data.code === 200) {
+          this.videoList = response.data.data.map(item => ({
+            id: item.videoId,
+            img: item.coverUrl,
+            title: item.title,
+            videoUrl: item.videoUrl,
+            duration: item.duration // 添加duration字段
+
+          }));
+          console.log('视频列表:', this.videoList);
+        } else {
+          console.error('API错误:', response.data.msg);
+        }
+      } catch (error) {
+        console.error('请求失败:', error);
+        // 4. 添加错误提示
+        this.$message.error('获取视频列表失败: ' + error.message);
+      }
+    },
+
+
     startAutoPlay() {  // 统一命名为 startAutoPlay
       this.stopAutoPlay(); // 先停止现有定时器
       this.timer = setInterval(() => {
@@ -125,7 +149,7 @@ export default {
     goToSlide(index) {
       this.currentIndex = index;
       this.startAutoPlay();
-    }
+    },
   }
 }
 </script>

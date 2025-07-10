@@ -1,7 +1,11 @@
 <template>
   <div class="video-page">
     <div class="video-header">
-      <h1>视频播放页 - ID: {{ id }}</h1>
+
+
+      <h1>视频播放页 - ID: {{ videoId }}</h1>
+
+
     </div>
 
     <div class="video-content">
@@ -10,19 +14,18 @@
             ref="videoPlayer"
             controls
             autoplay
-            src="../assets/video1.mp4"
+            :src="videoUrl"
             class="video-player"
             @play="onPlay"
             @pause="onPause"
             @timeupdate="onTimeUpdate"
-
         ></video>
-        <!--            :src="videoUrl"-->
 
       </div>
 
       <div class="video-info">
-        <h2>{{ videoTitle }}</h2>
+        <h1>{{ videoTitle }}</h1>
+        <h2>{{ videoDescription }}</h2>
         <p>{{ videoDescription }}</p>
       </div>
     </div>
@@ -40,19 +43,45 @@ export default {
   },
   data() {
     return {
+      videoId: '',
       videoUrl: '',
-      videoTitle: '视频标题',
-      videoDescription: '视频描述信息',
+      videoTitle: '',
+      tags: '',
+      description: '',
+      publishtime: '',
+      viewcount: '',
+      linkcount: '',
+      favoritecount: '',
+
+      videoDescription: '',
       isPlaying: false
     }
   },
   created() {
-    // 根据id获取视频信息
     this.fetchVideoData()
   },
   methods: {
-    fetchVideoData() {
-      this.videoUrl = `../assets/video1.mp4`
+    async fetchVideoData() {
+      try {
+        const response = await this.$axios.get(`http://localhost:8081/video/${this.id}`);
+        if (response.data.code === 200) {
+          this.videoId = response.data.data.videoId;
+          this.videoUrl = response.data.data.videoUrl;
+          this.videoTitle = response.data.data.title;
+          this.videoDescription = response.data.data.description;
+          this.publishtime = response.data.data.publishtime;
+          this.viewcount = response.data.data.viewcount;
+          this.linkcount = response.data.data.linkcount;
+          this.favoritecount = response.data.data.favoritecount;
+          console.log(response.data.data)
+
+        } else {
+          throw new Error(response.data.msg || '获取视频失败');
+        }
+      } catch (error) {
+        console.error('获取视频失败:', error);
+        this.$message.error('视频加载失败: ' + error.message);
+      }
     },
     onPlay() {
       this.isPlaying = true
