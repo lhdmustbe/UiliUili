@@ -57,8 +57,6 @@
     <orderEntry type="library" name="Maven: org.yaml:snakeyaml:2.4" level="project" />
     <orderEntry type="library" name="Maven: org.freemarker:freemarker:2.3.34" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context-support:6.2.8" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-beans:6.2.8" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-context:6.2.8" level="project" />
     <orderEntry type="library" name="Maven: com.baomidou:mybatis-plus-jsqlparser-4.9:3.5.12" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-web:3.5.3" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-json:3.5.3" level="project" />
@@ -76,8 +74,6 @@
     <orderEntry type="library" name="Maven: io.micrometer:micrometer-observation:1.15.1" level="project" />
     <orderEntry type="library" name="Maven: io.micrometer:micrometer-commons:1.15.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:6.2.8" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-aop:6.2.8" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-expression:6.2.8" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.mysql:mysql-connector-j:9.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter-test:3.5.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-test:3.5.3" level="project" />
@@ -112,5 +108,11 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:6.2.8" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.xmlunit:xmlunit-core:2.10.2" level="project" />
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.38" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:5.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:6.5.1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-aop:6.2.8" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-beans:6.2.8" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context:6.2.8" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-expression:6.2.8" level="project" />
   </component>
 </module>

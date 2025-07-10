@@ -52,11 +52,7 @@ export default {
   },
   methods: {
     fetchVideoData() {
-      // 这里应该根据id从API获取视频数据
-      // 示例代码，实际应该替换为您的API调用
       this.videoUrl = `../assets/video1.mp4`
-      // this.videoTitle = response.data.title
-      // this.videoDescription = response.data.description
     },
     onPlay() {
       this.isPlaying = true

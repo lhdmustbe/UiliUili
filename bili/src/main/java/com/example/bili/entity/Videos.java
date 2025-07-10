@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import com.example.bili.entity.Users;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ public class Videos implements Serializable {
      * 上传用户ID
      */
     private Long userId;
+
 
     private String title;
 
@@ -102,4 +104,6 @@ public class Videos implements Serializable {
      * 分享数
      */
     private Integer shareCount;
+
+    private String videoUrl;
 }

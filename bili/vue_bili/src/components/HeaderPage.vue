@@ -19,15 +19,16 @@
 
               <div class="personal_center"
                    :class="{ 'logged-in': isLoggedIn }">
-                {{ isLoggedIn ? userInfo.username : '登录' }}
+                {{ isLoggedIn ? userInfo.username.charAt(0) : '登录' }}
               </div>
 
             </a>
-
             <!-- 用户信息弹窗 -->
             <div v-if="isLoggedIn && showUserInfo" class="user-info-popup">
               <div class="user-info-header">
-                <span>{{ userInfo.username }}</span>
+                <span>用户名： {{ userInfo.username }}</span><br>
+                <span>邮箱： {{ userInfo.email }}</span><br>
+                <span>手机号： {{ userInfo.phone }}</span>
               </div>
               <div class="user-info-content">
                 <el-button @click="logout" type="text">退出登录</el-button>
@@ -71,11 +72,76 @@
           <span class="dialog-footer"
                 style="display: flex;justify-content: space-between ;width: 400px;margin: auto;margin-top: 20px">
           <el-button @click="loginVisible = false" style="width: 194px;height: 40px">取消</el-button>
+            <el-button type="primary" @click="register" style="width: 194px;height: 40px">注册</el-button>
           <el-button type="primary" @click="handleLogin" style="width: 194px;height: 40px">登录</el-button>
         </span>
         </el-form>
       </el-dialog>
+      <!--      注册框-->
+      <el-dialog
+          style="border-radius: 20px;padding: 20px;"
+          class=""
+          v-model="registerVisible"
+          title="用户注册"
+          width="500px"
+          :close-on-click-modal="false"
+      >
+        <el-form
+            :model="registerForm"
+            :rules="registerRules"
+            ref="registerFormRef"
+            label-width="80px"
+        >
+          <el-form-item label="用户名" prop="username">
+            <el-input
+                v-model="registerForm.username"
+                placeholder="请输入用户名"
+                clearable
+            />
+          </el-form-item>
 
+          <el-form-item label="密码" prop="password">
+            <el-input
+                v-model="registerForm.password"
+                placeholder="请输入密码"
+                type="password"
+                show-password
+            />
+          </el-form-item>
+
+          <el-form-item label="确认密码" prop="confirmPassword">
+            <el-input
+                v-model="registerForm.confirmPassword"
+                placeholder="请再次输入密码"
+                type="password"
+                show-password
+            />
+          </el-form-item>
+
+          <el-form-item label="邮箱" prop="email">
+            <el-input
+                v-model="registerForm.email"
+                placeholder="请输入邮箱"
+                clearable
+            />
+          </el-form-item>
+
+          <el-form-item label="手机号" prop="phone">
+            <el-input
+                v-model="registerForm.phone"
+                placeholder="请输入手机号"
+                clearable
+            />
+          </el-form-item>
+        </el-form>
+
+        <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="registerVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleRegister">注册</el-button>
+      </span>
+        </template>
+      </el-dialog>
 
     </div>
   </div>
@@ -91,6 +157,15 @@ export default {
       isLoggedIn: false, // 新增登录状态
       userInfo: null,
       showUserInfo: false,
+      registerVisible: false,
+
+      registerForm: {
+        username: '',
+        password: '',
+        confirmPassword: '',
+        email: '',
+        phone: ''
+      },
 
       inputValue: '',
       leftNav: ['首页', '番剧', '漫画', '直播'],
@@ -98,11 +173,86 @@ export default {
       loginVisible: false,
       loginForm: {
         username: '',
-        password: ''
+        password: '',
+        email: '',
+        phone: ''
+      }
+    }
+  },
+  computed: {
+    registerRules() {
+      const validatePassword = (rule, value, callback) => {
+        if (value !== this.registerForm.password) {
+          callback(new Error('两次输入的密码不一致'));
+        } else {
+          callback();
+        }
+      };
+
+      return {
+        username: [
+          {required: true, message: '请输入用户名', trigger: 'blur'},
+          {min: 3, max: 16, message: '长度在3到16个字符', trigger: 'blur'}
+        ],
+        password: [
+          {required: true, message: '请输入密码', trigger: 'blur'},
+          {min: 6, max: 20, message: '长度在6到20个字符', trigger: 'blur'}
+        ],
+        confirmPassword: [
+          {required: true, message: '请再次输入密码', trigger: 'blur'},
+          {validator: validatePassword, trigger: 'blur'}
+        ],
+        email: [
+          {required: true, message: '请输入邮箱', trigger: 'blur'},
+          {type: 'email', message: '请输入正确的邮箱格式', trigger: ['blur', 'change']}
+        ],
+        phone: [
+          {required: true, message: '请输入手机号', trigger: 'blur'},
+          {pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur'}
+        ]
       }
     }
   },
   methods: {
+    register() {
+      this.registerVisible = true;
+      this.$nextTick(() => {
+        this.$refs.registerFormRef?.resetFields();
+      });
+    },
+    handleRegisterClose() {
+      this.registerVisible = false;
+    },
+    async handleRegister() {
+      try {
+        // 验证表单
+        await this.$refs.registerFormRef.validate();
+
+        // 发送注册请求
+        const response = await this.$axios.post('http://localhost:8081/users/register', {
+          username: this.registerForm.username,
+          passwordHash: this.registerForm.password,
+          email: this.registerForm.email,
+          phone: this.registerForm.phone
+        });
+
+        if (response.data.code === 200) {
+          this.$message.success('注册成功');
+          this.registerVisible = false;
+
+          // 自动填充登录表单
+          this.loginForm.username = this.registerForm.username;
+          this.loginForm.password = this.registerForm.password;
+
+          // 可选：自动打开登录对话框
+          // this.loginVisible = true;
+        } else {
+          this.$message.error(response.data.msg);
+        }
+      } catch (error) {
+        this.$message.error('注册失败: ' + (error.response?.data?.msg || error.message));
+      }
+    },
     showLoginDialog() {
       // 已登录状态直接返回
       if (this.isLoggedIn) return;
@@ -115,15 +265,22 @@ export default {
       try {
         const response = await this.$axios.post('http://localhost:8081/users/login', {
           username: this.loginForm.username,
-          passwordHash: this.loginForm.password
+          passwordHash: this.loginForm.password,
         });
 
         if (response.data.code === 200) {
+          console.log('响应数据:', response.data);
           localStorage.setItem('token', response.data.data);
           this.$message.success('登录成功');
           this.isLoggedIn = true;
           this.loginVisible = false; // 强制关闭弹窗
-          this.userInfo = {username: this.loginForm.username}; // 保存用户信息
+          this.userInfo =
+              {
+                username: this.loginForm.username,
+                email: response.data.data.email,
+                phone: response.data.data.phone
+              }; // 保存用户信息
+
         } else {
           this.$message.error(response.data.msg);
         }
@@ -259,7 +416,7 @@ export default {
 
 .user-info-popup {
   position: absolute;
-  top: 120%;
+  top: 100%;
   right: 0%;
   width: 300px;
   background-color: white;
@@ -284,6 +441,8 @@ export default {
 }
 
 .personal_center.logged-in {
+  text-align: center;
+  font-size: 30px;
   background-color: #4CAF50;
   color: white;
 }
@@ -291,8 +450,4 @@ export default {
 .personal_center.logged-in:hover {
   transform: scale(1.2);
 }
-
-/*.personal_center.logged-in:hover .user-info-popup{*/
-/*  */
-/*}*/
 </style>
