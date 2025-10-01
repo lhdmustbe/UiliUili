@@ -73,11 +73,22 @@ export default {
       timer: null,
       mainVideo: [
         {id: 1, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
-        {id: 2, img: require('@/assets/gundong2.png'), title: '凸变英雄，b站出品'},
-        {id: 3, img: require('@/assets/gundong3.png'), title: '凸变英雄，b站出品'}
+        {id: 2, img: require('@/assets/gundong2.png'), title: '刺杀小说家'},
+        {id: 3, img: require('@/assets/gundong3.png'), title: '实况足球'}
       ],
       videoList: [],
-      recommendVideos: []
+      recommendVideos: [{id: 1, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
+        {id: 2, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
+        {id: 3, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
+        {id: 1, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
+        {id: 2, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
+        {id: 3, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
+        {id: 1, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
+        {id: 2, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
+        {id: 3, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
+        {id: 1, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
+        {id: 2, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},
+        {id: 3, img: require('@/assets/gundong1.png'), title: '凸变英雄，b站出品'},]
     }
   },
   computed: {
@@ -155,6 +166,7 @@ export default {
 </script>
 
 <style scoped>
+
 /* 轮播图相关样式 */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.8s ease;

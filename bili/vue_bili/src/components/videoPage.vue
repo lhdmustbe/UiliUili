@@ -1,32 +1,71 @@
 <template>
   <div class="video-page">
-    <div class="video-header">
-
-
-      <h1>视频播放页 - ID: {{ videoId }}</h1>
-
-
-    </div>
-
     <div class="video-content">
-      <div class="video-wrapper">
-        <video
-            ref="videoPlayer"
-            controls
-            autoplay
-            :src="videoUrl"
-            class="video-player"
-            @play="onPlay"
-            @pause="onPause"
-            @timeupdate="onTimeUpdate"
-        ></video>
+      <!-- 视频播放器区域 -->
+      <div class="video-section">
+        <div class="video-wrapper">
+          <video
+              ref="videoPlayer"
+              controls
+              autoplay
+              :src="videoUrl"
+              class="video-player"
+              @play="onPlay"
+              @pause="onPause"
+              @timeupdate="onTimeUpdate"
+          ></video>
+        </div>
 
+        <!-- 视频信息区域 -->
+        <div class="video-info">
+          <h1 class="video-title">{{ videoTitle }}</h1>
+
+          <div class="video-meta">
+            <div class="meta-left">
+              <span class="view-count">{{ viewcount }} 次观看</span>
+              <span class="publish-date">{{ formatDate(publishtime) }}</span>
+            </div>
+          </div>
+
+          <!-- 视频操作区域 -->
+          <div class="video-actions">
+            <div class="action-item" @click="likeVideo">
+              <i :class="['icon', 'like-icon', likeStatus ? 'liked' : '']"></i>
+              <span class="action-text">{{ formatCount(likeCount) }}</span>
+            </div>
+            <div class="action-item" @click="coinVideo">
+              <i :class="['icon', 'coin-icon', coinStatus ? 'coined' : '']"></i>
+              <span class="action-text">{{ formatCount(coinCount) }}</span>
+            </div>
+            <div class="action-item">
+              <i class="icon favorite-icon"></i>
+              <span class="action-text">{{ formatCount(favoritecount) }}</span>
+            </div>
+            <div class="action-item">
+              <i class="icon share-icon"></i>
+              <span class="action-text">分享</span>
+            </div>
+          </div>
+
+          <!-- 视频描述 -->
+          <div class="video-description">
+            <p>{{ videoDescription }}</p>
+          </div>
+        </div>
       </div>
 
-      <div class="video-info">
-        <h1>{{ videoTitle }}</h1>
-        <h2>{{ videoDescription }}</h2>
-        <p>{{ videoDescription }}</p>
+      <!-- 作者信息区域 -->
+      <div class="author-section">
+        <div class="author-info">
+          <div class="avatar-container">
+            <img src="../assets/toux.png" alt="" class="author-avatar">
+          </div>
+          <div class="author-details">
+            <h3 class="author-name">{{ authorName }}</h3>
+            <p class="author-desc">关注我获取更多视频</p>
+          </div>
+          <button class="follow-btn">+ 关注</button>
+        </div>
       </div>
     </div>
   </div>
@@ -52,9 +91,19 @@ export default {
       viewcount: '',
       linkcount: '',
       favoritecount: '',
-
       videoDescription: '',
-      isPlaying: false
+      isPlaying: false,
+
+      // 新增点赞投币相关数据
+      likeCount: 0,
+      coinCount: 0,
+      likeStatus: false,
+      coinStatus: false,
+
+      // 作者信息
+      authorAvatar: '',
+      authorName: '视频作者',
+      authorDesc: '这是作者的简介'
     }
   },
   created() {
@@ -73,8 +122,12 @@ export default {
           this.viewcount = response.data.data.viewcount;
           this.linkcount = response.data.data.linkcount;
           this.favoritecount = response.data.data.favoritecount;
-          console.log(response.data.data)
 
+          // 初始化点赞投币数据
+          this.likeCount = response.data.data.likecount || 0;
+          this.coinCount = response.data.data.coincount || 0;
+
+          console.log(response.data.data)
         } else {
           throw new Error(response.data.msg || '获取视频失败');
         }
@@ -93,6 +146,64 @@ export default {
     },
     onTimeUpdate() {
       // 可以在这里添加时间更新逻辑
+    },
+
+    // 点赞功能
+    likeVideo() {
+      if (this.likeStatus) {
+        // 取消点赞
+        this.likeCount--;
+        this.likeStatus = false;
+      } else {
+        // 点赞
+        this.likeCount++;
+        this.likeStatus = true;
+      }
+
+      // 这里可以添加向后端发送请求的逻辑
+      console.log('点赞状态:', this.likeStatus);
+    },
+
+    // 投币功能
+    coinVideo() {
+      if (this.coinStatus) {
+        // 取消投币
+        this.coinCount--;
+        this.coinStatus = false;
+      } else {
+        // 投币
+        this.coinCount++;
+        this.coinStatus = true;
+      }
+
+      // 这里可以添加向后端发送请求的逻辑
+      console.log('投币状态:', this.coinStatus);
+    },
+
+    // 格式化数字显示（大于1000显示k）
+    formatCount(count) {
+      if (count >= 1000) {
+        return (count / 1000).toFixed(1) + 'k';
+      }
+      return count;
+    },
+
+    // 格式化日期显示
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffTime = Math.abs(now - date);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        return '昨天';
+      } else if (diffDays < 30) {
+        return diffDays + '天前';
+      } else {
+        return date.getFullYear() + '-' +
+            (date.getMonth() + 1).toString().padStart(2, '0') + '-' +
+            date.getDate().toString().padStart(2, '0');
+      }
     }
   }
 }
@@ -102,13 +213,23 @@ export default {
 .video-page {
   min-width: 1200px;
   padding: 20px;
-  color: #fff;
+  background-color: #0d1117; /* 保持黑色背景 */
+  min-height: 100vh;
 }
 
 .video-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.video-section {
+  background-color: #0d1117; /* 改为黑色背景 */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
 }
 
 .video-wrapper {
@@ -117,7 +238,6 @@ export default {
   padding-bottom: 56.25%; /* 16:9 比例 */
   background-color: #000;
   overflow: hidden;
-  border-radius: 8px;
 }
 
 .video-player {
@@ -130,20 +250,185 @@ export default {
 }
 
 .video-info {
-  max-width: 800px;
-  margin: 20px auto;
+  background-color: #0d1117; /* 改为黑色背景 */
   padding: 20px;
-  background-color: #161b22;
+  color: #c9d1d9; /* 添加浅色文字 */
+}
+
+.video-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #c9d1d9; /* 改为浅色文字 */
+  margin-bottom: 15px;
+}
+
+.video-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #30363d; /* 改为深色边框 */
+}
+
+.meta-left {
+  display: flex;
+  gap: 15px;
+}
+
+.view-count, .publish-date {
+  color: #8b949e; /* 改为灰色文字 */
+  font-size: 14px;
+}
+
+/* 视频操作区域 */
+.video-actions {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 20px;
+  padding: 15px 0;
+  border-bottom: 1px solid #30363d; /* 改为深色边框 */
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.action-item:hover {
+  background-color: #30363d; /* 改为深色悬停背景 */
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 5px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* 点赞图标样式 */
+.like-icon:not(.liked) {
+  background-image: url('../assets/dz.png');
+}
+
+.like-icon.liked {
+  background-image: url('../assets/dz.png');
+}
+
+/* 投币图标样式 */
+.coin-icon:not(.coined) {
+  background-image: url('../assets/yb.png');
+}
+
+.coin-icon.coined {
+  background-image: url('../assets/yb.png');
+}
+
+.favorite-icon {
+  background-image: url('../assets/sc.png');
+}
+
+.share-icon {
+  background-image: url('../assets/zf.png');
+}
+
+.action-text {
+  font-size: 14px;
+  color: #8b949e; /* 改为灰色文字 */
+}
+
+.video-description {
+  padding: 15px;
+  background-color: #161b22; /* 改为深色背景 */
+  border-radius: 4px;
+  color: #c9d1d9; /* 改为浅色文字 */
+  line-height: 1.6;
+}
+
+/* 作者信息区域 */
+.author-section {
+  background-color: #0d1117; /* 改为黑色背景 */
   border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  padding: 20px;
 }
 
-.video-info h2 {
-  font-size: 24px;
-  margin-bottom: 10px;
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.video-info p {
+.avatar-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.author-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.author-details {
+  flex: 1;
+}
+
+.author-name {
   font-size: 16px;
-  color: #aaa;
+  font-weight: bold;
+  color: #c9d1d9; /* 改为浅色文字 */
+  margin-bottom: 5px;
+}
+
+.author-desc {
+  font-size: 13px;
+  color: #8b949e; /* 改为灰色文字 */
+}
+
+.follow-btn {
+  background-color: #00a1d6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.follow-btn:hover {
+  background-color: #0087b3;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .video-page {
+    min-width: 100%;
+    padding: 10px;
+  }
+
+  .video-content {
+    padding: 10px;
+  }
+
+  .video-actions {
+    gap: 15px;
+  }
+
+  .author-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }
 </style>
+

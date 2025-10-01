@@ -50,7 +50,7 @@
           style="border-radius: 20px"
           v-if="loginVisible"
           v-model="loginVisible"
-          width="30%"
+          width="600px"
           :style="{ display: isLoggedIn ? 'none' : 'block' }"
           :before-close="handleClose">
         <el-form :model="loginForm">
