@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory} from "vue-router"
 import VideoPage from './videoPage'
-import indexPage from "@/components/indexPage";  // 直接导入或保持动态导入
+import indexPage from "@/components/indexPage";
+import SearchPage from "@/components/SearchPage";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -13,6 +14,12 @@ const router = createRouter({
             path: "/video/:id",
             name: "VideoPage",
             component: VideoPage,
+            props: true
+        },
+        {
+            path: "/search",
+            name: "SearchPage",
+            component: SearchPage,
             props: true
         },
     ]

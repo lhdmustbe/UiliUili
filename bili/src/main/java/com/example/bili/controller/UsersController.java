@@ -2,11 +2,11 @@ package com.example.bili.controller;
 
 import com.example.bili.common.Result;
 import com.example.bili.entity.Users;
+import com.example.bili.mapper.UsersMapper;
 import com.example.bili.service.IUsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.stereotype.Controller;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +23,24 @@ import java.util.Map;
 @RestController
 @RequestMapping("/users")
 public class UsersController {
-    @Autowired
-    private IUsersService usersService;
+    private final IUsersService usersService;
+
+
+    public UsersController(IUsersService usersService) {
+        this.usersService = usersService;
+
+    }
 
     @GetMapping("/list")
     public List<Users> list() {
         return usersService.list();
+    }
+
+    @GetMapping("/username/{username}")
+    public Result getUserByUsername(@PathVariable String username) {
+        // 在Controller方法中
+        Users user = ((UsersMapper) usersService.getBaseMapper()).selectByUsername(username);
+        return Result.success(user);
     }
 
     @PostMapping("/login")

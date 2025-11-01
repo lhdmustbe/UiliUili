@@ -39,6 +39,7 @@ public class VideosController {
         data.put("viewCount", String.valueOf(video.getViewCount()));
         data.put("likeCount", String.valueOf(video.getLikeCount()));
         data.put("favoriteCount", String.valueOf(video.getFavoriteCount()));
+        data.put("coinCount", String.valueOf(video.getCoinCount()));
         return Result.success(data);
     }
 
@@ -78,7 +79,7 @@ public class VideosController {
     /**
      * 新增视频
      */
-    @PostMapping
+    @PostMapping("/save")
     public Result<Videos> save(@RequestBody Videos video) {
         videosService.save(video);
         return Result.success(video);
@@ -122,4 +123,66 @@ public class VideosController {
         return Result.success(page);
     }
 
+    @PostMapping("/{videoId}/like")
+    public Result<?> like(@PathVariable Long videoId, @RequestBody Map<String, Boolean> payload) {
+        // 获取点赞状态
+        Boolean likeStatus = payload.get("likeStatus");
+
+        // 获取视频
+        Videos video = videosService.getById(videoId);
+        if (video == null) {
+            return Result.fail("视频不存在");
+        }
+        if (likeStatus) {
+            video.setLikeCount(video.getLikeCount() + 1);
+        } else {
+            if (video.getLikeCount() > 0) {
+                video.setLikeCount(video.getLikeCount() - 1);
+            }
+        }
+        videosService.updateById(video);
+        return Result.success(video);
+    }
+
+    @PostMapping("/{videoId}/toubi")
+    public Result<?> toubi(@PathVariable Long videoId, @RequestBody Map<String, Boolean> payload) {
+        // 获取投币状态
+        Boolean coinStatus = payload.get("coinStatus");
+
+        // 获取视频
+        Videos video = videosService.getById(videoId);
+        if (video == null) {
+            return Result.fail("视频不存在");
+        }
+        if (coinStatus) {
+            video.setCoinCount(video.getCoinCount() + 1);
+        } else {
+            if (video.getCoinCount() > 0) {
+                video.setCoinCount(video.getCoinCount() - 1);
+            }
+        }
+        videosService.updateById(video);
+        return Result.success(video);
+    }
+
+    @PostMapping("/{videoId}/favorite")
+    public Result<?> favorite(@PathVariable Long videoId, @RequestBody Map<String, Boolean> payload) {
+        // 获取投币状态
+        Boolean favoriteStatus = payload.get("favoriteStatus");
+
+        // 获取视频
+        Videos video = videosService.getById(videoId);
+        if (video == null) {
+            return Result.fail("视频不存在");
+        }
+        if (favoriteStatus) {
+            video.setFavoriteCount(video.getFavoriteCount() + 1);
+        } else {
+            if (video.getFavoriteCount() > 0) {
+                video.setFavoriteCount(video.getFavoriteCount() - 1);
+            }
+        }
+        videosService.updateById(video);
+        return Result.success(video);
+    }
 }

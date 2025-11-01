@@ -22,8 +22,8 @@
 
           <div class="video-meta">
             <div class="meta-left">
-              <span class="view-count">{{ viewcount }} 次观看</span>
-              <span class="publish-date">{{ formatDate(publishtime) }}</span>
+              <span class="view-count">{{ viewCount }} 次观看</span>
+              <span class="publish-date">{{ publishTime }}</span>
             </div>
           </div>
 
@@ -31,15 +31,15 @@
           <div class="video-actions">
             <div class="action-item" @click="likeVideo">
               <i :class="['icon', 'like-icon', likeStatus ? 'liked' : '']"></i>
-              <span class="action-text">{{ formatCount(likeCount) }}</span>
+              <span class="action-text">{{ likeCount }}</span>
             </div>
             <div class="action-item" @click="coinVideo">
               <i :class="['icon', 'coin-icon', coinStatus ? 'coined' : '']"></i>
-              <span class="action-text">{{ formatCount(coinCount) }}</span>
+              <span class="action-text">{{ coinCount }}</span>
             </div>
-            <div class="action-item">
+            <div class="action-item" @click="favoriteVideo">
               <i class="icon favorite-icon"></i>
-              <span class="action-text">{{ formatCount(favoritecount) }}</span>
+              <span class="action-text">{{ favoriteCount }}</span>
             </div>
             <div class="action-item">
               <i class="icon share-icon"></i>
@@ -64,7 +64,9 @@
             <h3 class="author-name">{{ authorName }}</h3>
             <p class="author-desc">关注我获取更多视频</p>
           </div>
-          <button class="follow-btn">+ 关注</button>
+          <button class="follow-btn" :class="{ followed: isFollowed }" @click="toggleFollow">
+            {{ isFollowed ? '已关注' : '+ 关注' }}
+          </button>
         </div>
       </div>
     </div>
@@ -88,22 +90,26 @@ export default {
       tags: '',
       description: '',
       publishtime: '',
-      viewcount: '',
-      linkcount: '',
+      viewCount: '',
+      // linkcount: '',
       favoritecount: '',
       videoDescription: '',
+      publishTime: '',
       isPlaying: false,
 
       // 新增点赞投币相关数据
       likeCount: 0,
       coinCount: 0,
+      favoriteCount: 0,
       likeStatus: false,
       coinStatus: false,
+      favoriteStatus: false,
 
       // 作者信息
       authorAvatar: '',
       authorName: '视频作者',
-      authorDesc: '这是作者的简介'
+      authorDesc: '这是作者的简介',
+      isFollowed: false
     }
   },
   created() {
@@ -118,15 +124,12 @@ export default {
           this.videoUrl = response.data.data.videoUrl;
           this.videoTitle = response.data.data.title;
           this.videoDescription = response.data.data.description;
-          this.publishtime = response.data.data.publishtime;
-          this.viewcount = response.data.data.viewcount;
-          this.linkcount = response.data.data.linkcount;
-          this.favoritecount = response.data.data.favoritecount;
-
-          // 初始化点赞投币数据
-          this.likeCount = response.data.data.likecount || 0;
-          this.coinCount = response.data.data.coincount || 0;
-
+          this.publishTime = response.data.data.publishTime;
+          this.viewCount = response.data.data.viewCount;
+          this.favoriteCount = response.data.data.favoriteCount;
+          // // 初始化点赞投币数据
+          this.likeCount = response.data.data.likeCount || 0;
+          this.coinCount = response.data.data.coinCount || 0;
           console.log(response.data.data)
         } else {
           throw new Error(response.data.msg || '获取视频失败');
@@ -149,7 +152,7 @@ export default {
     },
 
     // 点赞功能
-    likeVideo() {
+    async likeVideo() {
       if (this.likeStatus) {
         // 取消点赞
         this.likeCount--;
@@ -159,13 +162,27 @@ export default {
         this.likeCount++;
         this.likeStatus = true;
       }
-
-      // 这里可以添加向后端发送请求的逻辑
+      try {
+        const response = await this.$axios.post(`http://localhost:8081/video/${this.id}/like`, {
+          likeStatus: this.likeStatus
+        });
+        console.log('点赞成功:', response.data);
+      } catch (error) {
+        console.error('点赞失败:', error);
+        if (this.likeStatus) {
+          this.likeCount--;
+          this.likeStatus = false;
+        } else {
+          this.likeCount++;
+          this.likeStatus = true;
+        }
+        this.$message.error('操作失败，请重试');
+      }
       console.log('点赞状态:', this.likeStatus);
     },
 
     // 投币功能
-    coinVideo() {
+    async coinVideo() {
       if (this.coinStatus) {
         // 取消投币
         this.coinCount--;
@@ -176,9 +193,56 @@ export default {
         this.coinStatus = true;
       }
 
-      // 这里可以添加向后端发送请求的逻辑
+      try {
+        const response = await this.$axios.post(`http://localhost:8081/video/${this.id}/toubi`, {
+          coinStatus: this.coinStatus
+        });
+        console.log('投币成功:', response.data);
+      } catch (error) {
+        console.error('投币失败:', error);
+        if (this.coinStatus) {
+          this.coinCount--;
+          this.coinStatus = false;
+        } else {
+          this.coinCount++;
+          this.coinStatus = true;
+        }
+        this.$message.error('操作失败，请重试');
+      }
       console.log('投币状态:', this.coinStatus);
     },
+
+
+    async favoriteVideo() {
+      if (this.favoriteStatus) {
+        // 取消收藏
+        this.favoriteCount--;
+        this.favoriteStatus = false;
+      } else {
+        // 投币
+        this.favoriteCount++;
+        this.favoriteStatus = true;
+      }
+
+      try {
+        const response = await this.$axios.post(`http://localhost:8081/video/${this.id}/favorite`, {
+          favoriteStatus: this.favoriteStatus
+        });
+        console.log('投币成功:', response.data);
+      } catch (error) {
+        console.error('投币失败:', error);
+        if (this.favoriteStatus) {
+          this.favoriteCount--;
+          this.favoriteStatus = false;
+        } else {
+          this.favoriteCount++;
+          this.favoriteStatus = true;
+        }
+        this.$message.error('操作失败，请重试');
+      }
+      console.log('投币状态:', this.favoriteStatus);
+    },
+
 
     // 格式化数字显示（大于1000显示k）
     formatCount(count) {
@@ -204,6 +268,13 @@ export default {
             (date.getMonth() + 1).toString().padStart(2, '0') + '-' +
             date.getDate().toString().padStart(2, '0');
       }
+    },
+
+    // 关注/取消关注功能
+    toggleFollow() {
+      this.isFollowed = !this.isFollowed;
+      // 这里可以添加向后端发送请求的逻辑
+      console.log('关注状态:', this.isFollowed);
     }
   }
 }
@@ -405,8 +476,17 @@ export default {
   transition: background-color 0.3s;
 }
 
+.follow-btn.followed {
+  background-color: #666;
+  cursor: default;
+}
+
 .follow-btn:hover {
   background-color: #0087b3;
+}
+
+.follow-btn.followed:hover {
+  background-color: #666;
 }
 
 /* 响应式设计 */

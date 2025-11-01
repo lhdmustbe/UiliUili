@@ -7,7 +7,8 @@
         </li>
       </ul>
 
-      <el-input v-model="inputValue" placeholder="请输入内容" class="search" suffix-icon="Search"></el-input>
+      <el-input v-model="inputValue" placeholder="请输入内容" class="search" suffix-icon="Search"
+                @keyup.enter="handleSearch"></el-input>
 
       <ul class="flex-item" style="margin-right: 45px">
         <li>
@@ -214,6 +215,18 @@ export default {
     }
   },
   methods: {
+    handleSearch() {
+      // 这里处理搜索逻辑
+      console.log('搜索内容:', this.inputValue);
+      // 跳转到搜索页面
+      if (this.inputValue.trim()) {
+        const routeData = this.$router.resolve({
+          name: 'SearchPage',
+          query: {keyword: this.inputValue}
+        });
+        window.open(routeData.href, '_blank');
+      }
+    },
     register() {
       this.registerVisible = true;
       this.$nextTick(() => {
@@ -270,7 +283,7 @@ export default {
 
         if (response.data.code === 200) {
           console.log('响应数据:', response.data);
-          localStorage.setItem('token', response.data.data);
+          localStorage.setItem('token', response.data.data);//存入token数据持久化
           this.$message.success('登录成功');
           this.isLoggedIn = true;
           this.loginVisible = false; // 强制关闭弹窗
