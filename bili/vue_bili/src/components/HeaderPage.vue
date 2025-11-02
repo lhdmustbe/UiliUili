@@ -39,7 +39,10 @@
         </li>
 
         <li v-for="item in rightNav" :key="item">
-          <a href="">
+          <a v-if="item === '投稿'" @click="goToUpload" href="javascript:void(0)">
+            {{ item }}
+          </a>
+          <a v-else href="">
             {{ item }}
           </a>
         </li>
@@ -215,6 +218,10 @@ export default {
     }
   },
   methods: {
+    goToUpload() {
+      const routeData = this.$router.resolve({name: 'UploadPage'});
+      window.open(routeData.href, '_blank');
+    },
     handleSearch() {
       // 这里处理搜索逻辑
       console.log('搜索内容:', this.inputValue);
